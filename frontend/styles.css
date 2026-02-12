@@ -1,0 +1,240 @@
+﻿:root {
+  --bg: #f5f1e8;
+  --ink: #1f2a37;
+  --card: #fffdf8;
+  --border: #d7ccb8;
+  --accent: #0f766e;
+  --accent-2: #164e63;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 20%, #fff7df 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, #dff2f1 0%, transparent 40%),
+    var(--bg);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  padding: 24px;
+  gap: 20px;
+}
+
+.preview-panel {
+  width: min(72vw, 980px);
+  min-height: min(85vh, 860px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: 0 14px 30px rgba(31, 42, 55, 0.12);
+  overflow: hidden;
+}
+
+.preview-panel.hidden {
+  display: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.api-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.6);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.api-gate-card {
+  width: min(92vw, 520px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  padding: 18px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.28);
+}
+
+.api-gate-card h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+#apiForm {
+  display: grid;
+  gap: 10px;
+}
+
+#apiKeyInput {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+}
+
+#providerSelect,
+#modelInput {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+}
+
+#apiSubmitBtn {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+}
+
+.preview-header {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.preview-header h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.file-name {
+  color: var(--accent-2);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview-body {
+  height: calc(100% - 58px);
+  min-height: calc(min(85vh, 860px) - 58px);
+  background: #fff;
+}
+
+.preview-body iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.placeholder {
+  margin: 0;
+  padding: 28px;
+  color: #667085;
+}
+
+.uploader-card {
+  width: min(88vw, 460px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: 0 10px 28px rgba(31, 42, 55, 0.18);
+  padding: 18px;
+  transition: all 0.35s ease;
+}
+
+.uploader-card h2 {
+  margin: 0 0 6px;
+}
+
+.uploader-card p {
+  margin: 0 0 14px;
+  color: #475467;
+}
+
+#uploadForm {
+  display: grid;
+  gap: 10px;
+}
+
+#fileInput {
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  background: #fffcf4;
+}
+
+#submitBtn {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+}
+
+#submitBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.status-text {
+  margin-top: 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  color: #475467;
+}
+
+.status-text.is-pending {
+  color: #0c5460;
+}
+
+.status-text.is-success {
+  color: #0f766e;
+}
+
+.status-text.is-error {
+  color: #b42318;
+}
+
+.uploader-card.docked {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: min(92vw, 360px);
+  z-index: 50;
+}
+
+.app-shell.has-preview {
+  grid-template-columns: minmax(0, 1fr);
+  place-items: stretch;
+  align-content: start;
+}
+
+.app-shell.has-preview .preview-panel {
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .preview-panel {
+    width: 100%;
+    min-height: 62vh;
+  }
+
+  .uploader-card.docked {
+    right: 10px;
+    bottom: 10px;
+    width: min(94vw, 340px);
+  }
+}
