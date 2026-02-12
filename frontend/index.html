@@ -7,24 +7,6 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <section id="apiGate" class="api-gate">
-      <div class="api-gate-card">
-        <h2>输入你的 API Key</h2>
-        <p>每次打开本网站都需要输入你自己的 API Key，系统不会保存到本地。</p>
-        <form id="apiForm">
-          <select id="providerSelect" required>
-            <option value="openai">OpenAI</option>
-            <option value="claude">Claude</option>
-            <option value="gemini">Gemini</option>
-          </select>
-          <input id="apiKeyInput" type="password" placeholder="sk-..." required />
-          <input id="modelInput" type="text" placeholder="模型名（可选，不填走默认）" />
-          <button id="apiSubmitBtn" type="submit">确认并开始</button>
-        </form>
-        <p id="apiGateStatus" class="status-text">请输入后再上传文件</p>
-      </div>
-    </section>
-
     <main class="app-shell">
       <section id="previewPanel" class="preview-panel hidden">
         <header class="preview-header">
@@ -38,12 +20,12 @@
 
       <aside id="uploader" class="uploader-card">
         <h2>文件上传</h2>
-        <p>支持 PDF / Word / PowerPoint，上传成功后将自动停靠到右下角。</p>
+        <p>上传 PDF 后将进行逐页渲染、文字坐标抽取、OCR 与图片块坐标提取，并生成 H5 预览。</p>
         <form id="uploadForm">
-          <input id="fileInput" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx" required />
+          <input id="fileInput" type="file" accept=".pdf" required />
           <button id="submitBtn" type="submit">上传并转换</button>
         </form>
-        <p id="statusText" class="status-text">请选择一个文件开始转换</p>
+        <p id="statusText" class="status-text">请选择 PDF 文件开始转换</p>
       </aside>
     </main>
 

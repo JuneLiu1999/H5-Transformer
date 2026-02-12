@@ -1,16 +1,5 @@
 const API_BASE = 'http://localhost:3001';
 
-const RECOMMENDED_MODELS = {
-  openai: 'gpt-4.1-mini',
-  claude: 'claude-3-5-sonnet-20241022',
-  gemini: 'gemini-2.5-pro'
-};
-
-let userApiKey = '';
-let aiProvider = 'openai';
-let aiModel = '';
-let isModelTouched = false;
-
 const appShell = document.querySelector('.app-shell');
 const uploader = document.getElementById('uploader');
 const previewPanel = document.getElementById('previewPanel');
@@ -20,13 +9,6 @@ const uploadForm = document.getElementById('uploadForm');
 const fileInput = document.getElementById('fileInput');
 const submitBtn = document.getElementById('submitBtn');
 const statusText = document.getElementById('statusText');
-const apiGate = document.getElementById('apiGate');
-const apiForm = document.getElementById('apiForm');
-const apiKeyInput = document.getElementById('apiKeyInput');
-const apiSubmitBtn = document.getElementById('apiSubmitBtn');
-const apiGateStatus = document.getElementById('apiGateStatus');
-const providerSelect = document.getElementById('providerSelect');
-const modelInput = document.getElementById('modelInput');
 
 const requiredNodes = [
   appShell,
@@ -37,14 +19,7 @@ const requiredNodes = [
   uploadForm,
   fileInput,
   submitBtn,
-  statusText,
-  apiGate,
-  apiForm,
-  apiKeyInput,
-  apiSubmitBtn,
-  apiGateStatus,
-  providerSelect,
-  modelInput
+  statusText
 ];
 
 if (requiredNodes.some((node) => !node)) {
@@ -59,79 +34,37 @@ function setStatus(text, type = 'idle') {
   if (type === 'pending') statusText.classList.add('is-pending');
 }
 
-function setApiGateStatus(text, type = 'idle') {
-  apiGateStatus.textContent = text;
-  apiGateStatus.classList.remove('is-error', 'is-success', 'is-pending');
-  if (type === 'error') apiGateStatus.classList.add('is-error');
-  if (type === 'success') apiGateStatus.classList.add('is-success');
-  if (type === 'pending') apiGateStatus.classList.add('is-pending');
-}
-
 function renderPreview(url) {
   previewBody.innerHTML = '';
   const iframe = document.createElement('iframe');
   iframe.src = `${API_BASE}${url}`;
-  iframe.title = 'Converted Preview';
+  iframe.title = 'H5 Converted Preview';
   previewBody.appendChild(iframe);
 }
-
-function applyRecommendedModel(provider) {
-  const recommended = RECOMMENDED_MODELS[provider] || '';
-  modelInput.placeholder = recommended
-    ? `Model (default: ${recommended})`
-    : 'Model (optional)';
-  if (!isModelTouched || !modelInput.value.trim()) {
-    modelInput.value = recommended;
-  }
-}
-
-providerSelect.addEventListener('change', () => {
-  aiProvider = providerSelect.value;
-  applyRecommendedModel(aiProvider);
-});
-
-modelInput.addEventListener('input', () => {
-  isModelTouched = true;
-});
-
-apiForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-
-  const value = apiKeyInput.value.trim();
-  if (!value) {
-    setApiGateStatus('API Key is required.', 'error');
-    return;
-  }
-
-  userApiKey = value;
-  aiProvider = providerSelect.value;
-  aiModel = modelInput.value.trim();
-
-  apiGate.classList.add('hidden');
-  setStatus(`API key is set. Provider: ${aiProvider}. Select a file to continue.`);
-});
 
 fileInput.addEventListener('change', () => {
   const selected = fileInput.files?.[0];
   if (!selected) {
-    setStatus('Please select a file to start.');
+    setStatus('请选择 PDF 文件开始转换');
     return;
   }
-  setStatus(`Selected: ${selected.name}`);
+  if (!selected.name.toLowerCase().endsWith('.pdf')) {
+    setStatus('当前仅支持 PDF 文件', 'error');
+    return;
+  }
+  setStatus(`已选择：${selected.name}`);
 });
 
 uploadForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  if (!userApiKey) {
-    apiGate.classList.remove('hidden');
-    setApiGateStatus('Please enter your API key first.', 'error');
-    return;
-  }
-
   const file = fileInput.files?.[0];
   if (!file) {
-    setStatus('Please select a file first.', 'error');
+    setStatus('请先选择文件', 'error');
+    return;
+  }
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    setStatus('当前仅支持 PDF 文件', 'error');
     return;
   }
 
@@ -139,17 +72,12 @@ uploadForm.addEventListener('submit', async (event) => {
   formData.append('file', file);
 
   submitBtn.disabled = true;
-  submitBtn.textContent = 'Uploading...';
-  setStatus('Uploading and converting. Please wait...', 'pending');
+  submitBtn.textContent = '处理中...';
+  setStatus('正在执行 PDF 渲染、文字坐标抽取、OCR 与 H5 生成，请稍候...', 'pending');
 
   try {
     const resp = await fetch(`${API_BASE}/api/upload`, {
       method: 'POST',
-      headers: {
-        'x-user-api-key': userApiKey,
-        'x-ai-provider': aiProvider,
-        ...(aiModel ? { 'x-ai-model': aiModel } : {})
-      },
       body: formData
     });
 
@@ -157,11 +85,11 @@ uploadForm.addEventListener('submit', async (event) => {
     try {
       data = await resp.json();
     } catch {
-      throw new Error('Server returned invalid JSON.');
+      throw new Error('服务端返回格式错误');
     }
 
     if (!resp.ok) {
-      throw new Error(data.error || 'Upload failed.');
+      throw new Error(data.error || '上传失败');
     }
 
     appShell.classList.add('has-preview');
@@ -170,13 +98,11 @@ uploadForm.addEventListener('submit', async (event) => {
 
     fileName.textContent = data.originalName || file.name;
     renderPreview(data.previewUrl);
-    setStatus(data.note || 'Upload and conversion succeeded.', 'success');
+    setStatus(data.note || '转换完成', 'success');
   } catch (error) {
-    setStatus(error.message || 'Upload failed.', 'error');
+    setStatus(error.message || '上传失败', 'error');
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Upload and Convert';
+    submitBtn.textContent = '上传并转换';
   }
 });
-
-applyRecommendedModel(providerSelect.value);
